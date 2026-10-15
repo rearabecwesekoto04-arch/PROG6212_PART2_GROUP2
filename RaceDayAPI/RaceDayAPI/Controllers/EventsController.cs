@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RaceDayAPI.Data;
 using RaceDayAPI.Models;
+using RaceDayAPI.Dtos;
 using System.Security.Claims;
 
 namespace RaceDayAPI.Controllers
@@ -22,7 +24,7 @@ namespace RaceDayAPI.Controllers
         }
 
         [HttpPost, Authorize(Roles = "Organiser")]
-        public async Task<IActionResult> Create(EventDto d)
+        public async Task<IActionResult> Create(Dtos.Dtos.EventDto d)
         {
             var ev = new Event
             {
@@ -40,7 +42,7 @@ namespace RaceDayAPI.Controllers
         }
 
         [HttpPut("{id}"), Authorize(Roles = "Organiser")]
-        public async Task<IActionResult> Update(int id, EventDto d)
+        public async Task<IActionResult> Update(int id, Dtos.Dtos.EventDto d)
         {
             var ev = await db.Events.FindAsync(id);
             if (ev == null) return NotFound();

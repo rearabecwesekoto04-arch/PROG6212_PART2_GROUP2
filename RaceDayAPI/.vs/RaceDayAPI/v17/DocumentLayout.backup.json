@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\Student\\source\\repos\\RaceDayAPI\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{67E90C22-7BE3-461B-9DE6-CBFEF5865E54}|RaceDayAPI\\RaceDayAPI.csproj|c:\\users\\student\\source\\repos\\racedayapi\\racedayapi\\controllers\\eventscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{67E90C22-7BE3-461B-9DE6-CBFEF5865E54}|RaceDayAPI\\RaceDayAPI.csproj|solutionrelative:racedayapi\\controllers\\eventscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{67E90C22-7BE3-461B-9DE6-CBFEF5865E54}|RaceDayAPI\\RaceDayAPI.csproj|c:\\users\\student\\source\\repos\\racedayapi\\racedayapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{67E90C22-7BE3-461B-9DE6-CBFEF5865E54}|RaceDayAPI\\RaceDayAPI.csproj|solutionrelative:racedayapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -54,7 +58,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
@@ -66,7 +70,24 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
+              "Title": "EventsController.cs",
+              "DocumentMoniker": "C:\\Users\\Student\\source\\repos\\RaceDayAPI\\RaceDayAPI\\Controllers\\EventsController.cs",
+              "RelativeDocumentMoniker": "RaceDayAPI\\Controllers\\EventsController.cs",
+              "ToolTip": "C:\\Users\\Student\\source\\repos\\RaceDayAPI\\RaceDayAPI\\Controllers\\EventsController.cs*",
+              "RelativeToolTip": "RaceDayAPI\\Controllers\\EventsController.cs*",
+              "ViewState": "AgIAABYAAAAAAAAAAAAgwD4AAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-15T09:39:54.426Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "DbSeeder.cs",
               "DocumentMoniker": "C:\\Users\\Student\\source\\repos\\RaceDayAPI\\RaceDayAPI\\Data\\DbSeeder.cs",
               "RelativeDocumentMoniker": "RaceDayAPI\\Data\\DbSeeder.cs",
@@ -78,7 +99,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "AuthController.cs",
               "DocumentMoniker": "C:\\Users\\Student\\source\\repos\\RaceDayAPI\\RaceDayAPI\\Controllers\\AuthController.cs",
               "RelativeDocumentMoniker": "RaceDayAPI\\Controllers\\AuthController.cs",
@@ -91,7 +112,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\Student\\source\\repos\\RaceDayAPI\\RaceDayAPI\\Program.cs",
               "RelativeDocumentMoniker": "RaceDayAPI\\Program.cs",
@@ -103,7 +124,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Users\\Student\\source\\repos\\RaceDayAPI\\RaceDayAPI\\appsettings.json",
               "RelativeDocumentMoniker": "RaceDayAPI\\appsettings.json",
@@ -115,7 +136,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "AppDbContext.cs",
               "DocumentMoniker": "C:\\Users\\Student\\source\\repos\\RaceDayAPI\\RaceDayAPI\\Data\\AppDbContext.cs",
               "RelativeDocumentMoniker": "RaceDayAPI\\Data\\AppDbContext.cs",
@@ -127,7 +148,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "User.cs",
               "DocumentMoniker": "C:\\Users\\Student\\source\\repos\\RaceDayAPI\\RaceDayAPI\\Models\\User.cs",
               "RelativeDocumentMoniker": "RaceDayAPI\\Models\\User.cs",
@@ -139,7 +160,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "Result.cs",
               "DocumentMoniker": "C:\\Users\\Student\\source\\repos\\RaceDayAPI\\RaceDayAPI\\Models\\Result.cs",
               "RelativeDocumentMoniker": "RaceDayAPI\\Models\\Result.cs",
@@ -151,7 +172,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "Enrolment.cs",
               "DocumentMoniker": "C:\\Users\\Student\\source\\repos\\RaceDayAPI\\RaceDayAPI\\Models\\Enrolment.cs",
               "RelativeDocumentMoniker": "RaceDayAPI\\Models\\Enrolment.cs",
@@ -163,7 +184,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "Category.cs",
               "DocumentMoniker": "C:\\Users\\Student\\source\\repos\\RaceDayAPI\\RaceDayAPI\\Models\\Category.cs",
               "RelativeDocumentMoniker": "RaceDayAPI\\Models\\Category.cs",
@@ -175,7 +196,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "Event.cs",
               "DocumentMoniker": "C:\\Users\\Student\\source\\repos\\RaceDayAPI\\RaceDayAPI\\Models\\Event.cs",
               "RelativeDocumentMoniker": "RaceDayAPI\\Models\\Event.cs",
@@ -187,7 +208,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "Role.cs",
               "DocumentMoniker": "C:\\Users\\Student\\source\\repos\\RaceDayAPI\\RaceDayAPI\\Models\\Role.cs",
               "RelativeDocumentMoniker": "RaceDayAPI\\Models\\Role.cs",
@@ -196,10 +217,6 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-10-15T08:11:23.618Z"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
             }
           ]
         }
