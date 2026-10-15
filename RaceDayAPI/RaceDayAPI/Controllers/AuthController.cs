@@ -19,8 +19,8 @@ namespace RaceDayAPI.Controllers
         {
             if (await db.Users.AnyAsync(u => u.Email == dto.Email))
                 return Conflict("Email already registered.");
-            var role = await db.Roles.FirstOrDefaultAsync(r => r.RoleName == dto.Role);
-            if (role == null) return BadRequest("Role must be Organiser or Participant.");
+
+            var role = await db.Roles.FirstAsync(r => r.RoleName == "Participant");
 
             db.Users.Add(new User
             {
