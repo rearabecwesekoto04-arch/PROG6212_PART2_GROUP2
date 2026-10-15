@@ -1,0 +1,259 @@
+﻿using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
+using System.Net;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using Xunit;
+using static RaceDayAPI.Dtos.Dtos;
+
+
+namespace RaceDayAPI.Tests
+{
+    
+
+    public class EventsControllerTests : IClassFixture<WebApplicationFactory<Program>>
+    {
+        private readonly WebApplicationFactory<Program> _factory;
+
+        // Seeded accounts (from DbSeeder)
+        private const string Password = "Password123!";
+        private const string Organiser1 = "tr.otokes23@raceday.co.za";
+        private const string Organiser2 = "sebotse.mm21@raceday.co.za";
+        private const string Participant = "shoni.sp12@raceday.co.za";
+
+        public EventsControllerTests(WebApplicationFactory<Program> factory) => _factory = factory;
+
+        // ---------- helpers ----------
+        private record TokenResponse(string Token);
+        private record EventResponse(int EventId, int OrganiserId, string EventName, string? Description,
+                                     DateTime EventDate, string Location, decimal Distance,
+                                     string EventType, string? RouteInfo);
+
+        /// <summary>Creates a client, logged in as the given user (or anonymous if null).</summary>
+        private async Task<HttpClient> ClientAs(string? email)
+        {
+            var client = _factory.CreateClient();
+            if (email == null) return client;
+
+            var res = await client.PostAsJsonAsync("/api/auth/login", new LoginDto(email, Password));
+            res.EnsureSuccessStatusCode();
+            var token = (await res.Content.ReadFromJsonAsync<TokenResponse>())!.Token;
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            return client;
+        }
+
+        private static EventDto NewEventDto(string name = "Test Event") =>
+            new(name, "A test event", DateTime.UtcNow.AddDays(30), "Johannesburg", 10m, "Run", "Flat route");
+
+        /// <summary>Creates an event as the given organiser and returns it.</summary>
+        private async Task<EventResponse> CreateEventAs(string organiserEmail, string name = "Test Event")
+        {
+            var client = await ClientAs(organiserEmail);
+            var res = await client.PostAsJsonAsync("/api/events", NewEventDto(name));
+            Assert.Equal(HttpStatusCode.Created, res.StatusCode);
+            return (await res.Content.ReadFromJsonAsync<EventResponse>())!;
+        }
+
+        // ---------- GET /api/events ----------
+        [Fact]
+        public async Task GetAll_NoToken_Returns401()
+        {
+            var client = await ClientAs(null);
+            var res = await client.GetAsync("/api/events");
+            Assert.Equal(HttpStatusCode.Unauthorized, res.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(Organiser1)]
+        [InlineData(Participant)]
+        public async Task GetAll_AnyAuthenticatedRole_Returns200AndContainsCreatedEvent(string email)
+        {
+            var created = await CreateEventAs(Organiser1, "Visible To All");
+            var client = await ClientAs(email);
+
+            var res = await client.GetAsync("/api/events");
+
+            Assert.Equal(HttpStatusCode.OK, res.StatusCode);
+            var events = await res.Content.ReadFromJsonAsync<List<EventResponse>>();
+            Assert.Contains(events!, e => e.EventId == created.EventId);
+        }
+
+        // ---------- GET /api/events/{id} ----------
+        [Fact]
+        public async Task GetById_Existing_Returns200WithCorrectEvent()
+        {
+            var created = await CreateEventAs(Organiser1, "Find Me");
+            var client = await ClientAs(Participant);
+
+            var res = await client.GetAsync($"/api/events/{created.EventId}");
+
+            Assert.Equal(HttpStatusCode.OK, res.StatusCode);
+            var ev = await res.Content.ReadFromJsonAsync<EventResponse>();
+            Assert.Equal("Find Me", ev!.EventName);
+        }
+
+        [Fact]
+        public async Task GetById_NonExistent_Returns404()
+        {
+            var client = await ClientAs(Organiser1);
+            var res = await client.GetAsync("/api/events/99999");
+            Assert.Equal(HttpStatusCode.NotFound, res.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetById_NoToken_Returns401()
+        {
+            var client = await ClientAs(null);
+            var res = await client.GetAsync("/api/events/1");
+            Assert.Equal(HttpStatusCode.Unauthorized, res.StatusCode);
+        }
+
+        // ---------- POST /api/events ----------
+        [Fact]
+        public async Task Create_AsOrganiser_Returns201AndEventIsStored()
+        {
+            var client = await ClientAs(Organiser1);
+
+            var res = await client.PostAsJsonAsync("/api/events", NewEventDto("Created By Organiser"));
+
+            Assert.Equal(HttpStatusCode.Created, res.StatusCode);
+            var created = await res.Content.ReadFromJsonAsync<EventResponse>();
+            Assert.Equal("Created By Organiser", created!.EventName);
+
+            // verify it was actually persisted
+            var get = await client.GetAsync($"/api/events/{created.EventId}");
+            Assert.Equal(HttpStatusCode.OK, get.StatusCode);
+        }
+
+        [Fact]
+        public async Task Create_AsOrganiser_SetsOrganiserIdFromToken()
+        {
+            var a = await CreateEventAs(Organiser1);
+            var b = await CreateEventAs(Organiser2);
+            Assert.NotEqual(a.OrganiserId, b.OrganiserId);
+        }
+
+        [Fact]
+        public async Task Create_AsParticipant_Returns403()
+        {
+            var client = await ClientAs(Participant);
+            var res = await client.PostAsJsonAsync("/api/events", NewEventDto());
+            Assert.Equal(HttpStatusCode.Forbidden, res.StatusCode);
+        }
+
+        [Fact]
+        public async Task Create_NoToken_Returns401()
+        {
+            var client = await ClientAs(null);
+            var res = await client.PostAsJsonAsync("/api/events", NewEventDto());
+            Assert.Equal(HttpStatusCode.Unauthorized, res.StatusCode);
+        }
+
+        // ---------- PUT /api/events/{id} ----------
+        [Fact]
+        public async Task Update_AsOwner_Returns204AndChangesArePersisted()
+        {
+            var created = await CreateEventAs(Organiser1, "Before");
+            var client = await ClientAs(Organiser1);
+            var updated = NewEventDto("After") with { Location = "Soweto", Distance = 21.1m };
+
+            var res = await client.PutAsJsonAsync($"/api/events/{created.EventId}", updated);
+
+            Assert.Equal(HttpStatusCode.NoContent, res.StatusCode);
+            var ev = await client.GetFromJsonAsync<EventResponse>($"/api/events/{created.EventId}");
+            Assert.Equal("After", ev!.EventName);
+            Assert.Equal("Soweto", ev.Location);
+            Assert.Equal(21.1m, ev.Distance);
+        }
+
+        [Fact]
+        public async Task Update_AsDifferentOrganiser_Returns403AndEventUnchanged()
+        {
+            var created = await CreateEventAs(Organiser1, "Not Yours");
+            var other = await ClientAs(Organiser2);
+
+            var res = await other.PutAsJsonAsync($"/api/events/{created.EventId}", NewEventDto("Hijacked"));
+
+            Assert.Equal(HttpStatusCode.Forbidden, res.StatusCode);
+            var ev = await other.GetFromJsonAsync<EventResponse>($"/api/events/{created.EventId}");
+            Assert.Equal("Not Yours", ev!.EventName);
+        }
+
+        [Fact]
+        public async Task Update_AsParticipant_Returns403()
+        {
+            var created = await CreateEventAs(Organiser1);
+            var client = await ClientAs(Participant);
+            var res = await client.PutAsJsonAsync($"/api/events/{created.EventId}", NewEventDto("Nope"));
+            Assert.Equal(HttpStatusCode.Forbidden, res.StatusCode);
+        }
+
+        [Fact]
+        public async Task Update_NonExistent_Returns404()
+        {
+            var client = await ClientAs(Organiser1);
+            var res = await client.PutAsJsonAsync("/api/events/99999", NewEventDto());
+            Assert.Equal(HttpStatusCode.NotFound, res.StatusCode);
+        }
+
+        [Fact]
+        public async Task Update_NoToken_Returns401()
+        {
+            var client = await ClientAs(null);
+            var res = await client.PutAsJsonAsync("/api/events/1", NewEventDto());
+            Assert.Equal(HttpStatusCode.Unauthorized, res.StatusCode);
+        }
+
+        // ---------- DELETE /api/events/{id} ----------
+        [Fact]
+        public async Task Delete_AsOwner_Returns204AndEventIsGone()
+        {
+            var created = await CreateEventAs(Organiser1, "Delete Me");
+            var client = await ClientAs(Organiser1);
+
+            var res = await client.DeleteAsync($"/api/events/{created.EventId}");
+
+            Assert.Equal(HttpStatusCode.NoContent, res.StatusCode);
+            var get = await client.GetAsync($"/api/events/{created.EventId}");
+            Assert.Equal(HttpStatusCode.NotFound, get.StatusCode);
+        }
+
+        [Fact]
+        public async Task Delete_AsDifferentOrganiser_Returns403AndEventStillExists()
+        {
+            var created = await CreateEventAs(Organiser1, "Keep Me");
+            var other = await ClientAs(Organiser2);
+
+            var res = await other.DeleteAsync($"/api/events/{created.EventId}");
+
+            Assert.Equal(HttpStatusCode.Forbidden, res.StatusCode);
+            var get = await other.GetAsync($"/api/events/{created.EventId}");
+            Assert.Equal(HttpStatusCode.OK, get.StatusCode);
+        }
+
+        [Fact]
+        public async Task Delete_AsParticipant_Returns403()
+        {
+            var created = await CreateEventAs(Organiser1);
+            var client = await ClientAs(Participant);
+            var res = await client.DeleteAsync($"/api/events/{created.EventId}");
+            Assert.Equal(HttpStatusCode.Forbidden, res.StatusCode);
+        }
+
+        [Fact]
+        public async Task Delete_NonExistent_Returns404()
+        {
+            var client = await ClientAs(Organiser1);
+            var res = await client.DeleteAsync("/api/events/99999");
+            Assert.Equal(HttpStatusCode.NotFound, res.StatusCode);
+        }
+
+        [Fact]
+        public async Task Delete_NoToken_Returns401()
+        {
+            var client = await ClientAs(null);
+            var res = await client.DeleteAsync("/api/events/1");
+            Assert.Equal(HttpStatusCode.Unauthorized, res.StatusCode);
+        }
+    }
+}
