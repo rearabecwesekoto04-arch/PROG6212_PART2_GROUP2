@@ -41,6 +41,10 @@ builder.Services.AddSwaggerGen(c => {
 });
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    DbSeeder.Seed(scope.ServiceProvider.GetRequiredService<AppDbContext>());
+}
 app.UseSwagger(); app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseAuthentication();   // must come before UseAuthorization
